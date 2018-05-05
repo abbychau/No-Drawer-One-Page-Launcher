@@ -18,14 +18,21 @@ import android.view.*
 import android.view.ContextMenu.ContextMenuInfo
 import kotlinx.android.synthetic.main.layout_home.*
 import android.view.Menu
+import android.widget.TextView
+import android.view.LayoutInflater
+import android.view.ViewGroup
+
+
 
 
 class Home : Activity() {
     private val prefKey = "removed_set"
     private lateinit var apps: List<ResolveInfo>
-    private lateinit var appsHidden: MutableList<String>
     private var adapterHandle = AppsAdapter()
     private lateinit var preference : SharedPreferences
+    private lateinit var removedSet : MutableSet<String>
+
+
     private fun onSetWallpaper() {
         val pickWallpaper = Intent(Intent.ACTION_SET_WALLPAPER)
         val chooser = Intent.createChooser(pickWallpaper, "Choose a Wallpaper")
@@ -62,14 +69,8 @@ class Home : Activity() {
                 R.id.menu_hide -> {
 
                     val name = apps[i].activityInfo.packageName
-                    appsHidden.add(name)
-
-                    var currentSet = preference.getStringSet(prefKey,null)
-                    if (currentSet == null) {
-                        currentSet = HashSet<String>()
-                    }
-                    currentSet.add(name)
-                    preference.edit().putStringSet(prefKey, currentSet).apply()
+                    removedSet.add(name)
+                    preference.edit().putStringSet(prefKey, removedSet).apply()
 
                     adapterHandle.notifyDataSetChanged()
                     apps_list.adapter = adapterHandle
@@ -102,14 +103,14 @@ class Home : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_home)
         preference = PreferenceManager.getDefaultSharedPreferences(this)!!
-        btn2.setOnClickListener { onSetWallpaper() }
-        val k = preference.getStringSet(prefKey, null)
-        appsHidden = k?.toMutableList() ?: arrayListOf()
+        removedSet = preference.getStringSet(prefKey,null)
+
         loadApps()
         apps_list.adapter = adapterHandle
         apps_list.onItemClickListener = clickListener
         apps_list.onItemLongClickListener = longClickListener
         //registerForContextMenu(apps_list)
+        btn2.setOnClickListener { onSetWallpaper() }
 
         txtSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
@@ -150,7 +151,6 @@ class Home : Activity() {
         ImageView(this@Home)
 
         apps = packageManager.queryIntentActivities(mainIntent, 0)
-        val removedSet = preference.getStringSet(prefKey,null)
 
         apps = apps
                 .filter {
@@ -184,19 +184,19 @@ class Home : Activity() {
             val inflater = this@Home
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val gridView : View
+            val info = apps[i]
+
             if (convertView == null) {
 
                 gridView = inflater.inflate(R.layout.app_grid, parent, false)
-                val tv = gridView.findViewById<View>(R.id.app_grid_text) as TextView
-                val iv = gridView.findViewById<View>(R.id.app_grid_image) as ImageView
-
-                val info = apps[i]
-                iv.setImageDrawable(info.activityInfo.loadIcon(packageManager))
-                tv.text = info.loadLabel(packageManager)
 
             } else {
                 gridView = convertView
             }
+            val tv = gridView.findViewById<View>(R.id.app_grid_text) as TextView
+            val iv = gridView.findViewById<View>(R.id.app_grid_image) as ImageView
+            iv.setImageDrawable(info.activityInfo.loadIcon(packageManager))
+            tv.text = info.loadLabel(packageManager)
 
             return gridView
         }
