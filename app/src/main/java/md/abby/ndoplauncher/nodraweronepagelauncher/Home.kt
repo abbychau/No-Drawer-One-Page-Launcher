@@ -20,7 +20,7 @@ import android.view.Menu
 
 class Home : Activity() {
     private val prefKey = "removed_set"
-    private lateinit var apps: MutableList<ResolveInfo>
+    private lateinit var apps: List<ResolveInfo>
     private lateinit var appsHidden: MutableList<String>
     private var adapterHandle = AppsAdapter()
     private lateinit var preference : SharedPreferences
@@ -58,18 +58,19 @@ class Home : Activity() {
                     startActivity(intent)
                 }
                 R.id.menu_hide -> {
-                    val item = apps.removeAt(i)
-                    appsHidden.add(item.activityInfo.packageName)
-
-                    var currentSet = preference.getStringSet(prefKey,null)
-                    if (currentSet == null) {
-                        currentSet = HashSet<String>()
-                    }
-                    currentSet.add(item.activityInfo.packageName)
-                    preference.edit().putStringSet(prefKey, currentSet).apply()
-
-                    adapterHandle.notifyDataSetChanged()
-                    apps_list.adapter = adapterHandle
+//
+//                    val item = apps.removeAt(i)
+//                    appsHidden.add(item.activityInfo.packageName)
+//
+//                    var currentSet = preference.getStringSet(prefKey,null)
+//                    if (currentSet == null) {
+//                        currentSet = HashSet<String>()
+//                    }
+//                    currentSet.add(item.activityInfo.packageName)
+//                    preference.edit().putStringSet(prefKey, currentSet).apply()
+//
+//                    adapterHandle.notifyDataSetChanged()
+//                    apps_list.adapter = adapterHandle
 
                 }
                 R.id.menu_add_to_dock -> {
@@ -131,6 +132,7 @@ class Home : Activity() {
 
         apps = packageManager.queryIntentActivities(mainIntent, 0)
         val removedSet = preference.getStringSet(prefKey,null)
+/*
         apps = apps
                 .filter {
                     removedSet == null ||
@@ -139,6 +141,7 @@ class Home : Activity() {
                 }
                 .sortedBy { it.activityInfo.loadLabel(packageManager).toString() }
                 .toMutableList()
+                */
     }
 
     private fun toast(t: String){
