@@ -40,7 +40,9 @@ class Home : Activity() {
         intent.component = component
         startActivity(intent)
     }
-
+    override fun onBackPressed() {
+        //super.onBackPressed()
+    }
     private val longClickListener = AdapterView.OnItemLongClickListener { _: AdapterView<*>, view1: View, i: Int, _: Long ->
         val info = apps[i]
         val pkg = info.activityInfo.packageName
