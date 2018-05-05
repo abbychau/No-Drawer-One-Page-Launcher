@@ -9,6 +9,8 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.Toast
@@ -58,19 +60,19 @@ class Home : Activity() {
                     startActivity(intent)
                 }
                 R.id.menu_hide -> {
-//
-//                    val item = apps.removeAt(i)
-//                    appsHidden.add(item.activityInfo.packageName)
-//
-//                    var currentSet = preference.getStringSet(prefKey,null)
-//                    if (currentSet == null) {
-//                        currentSet = HashSet<String>()
-//                    }
-//                    currentSet.add(item.activityInfo.packageName)
-//                    preference.edit().putStringSet(prefKey, currentSet).apply()
-//
-//                    adapterHandle.notifyDataSetChanged()
-//                    apps_list.adapter = adapterHandle
+
+                    val name = apps[i].activityInfo.packageName
+                    appsHidden.add(name)
+
+                    var currentSet = preference.getStringSet(prefKey,null)
+                    if (currentSet == null) {
+                        currentSet = HashSet<String>()
+                    }
+                    currentSet.add(name)
+                    preference.edit().putStringSet(prefKey, currentSet).apply()
+
+                    adapterHandle.notifyDataSetChanged()
+                    apps_list.adapter = adapterHandle
 
                 }
                 R.id.menu_add_to_dock -> {
@@ -108,6 +110,23 @@ class Home : Activity() {
         apps_list.onItemClickListener = clickListener
         apps_list.onItemLongClickListener = longClickListener
         //registerForContextMenu(apps_list)
+
+        txtSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                if(p0.toString().isNotEmpty()){
+                    apps_list.visibility = View.INVISIBLE
+                    //TODO
+                }else{
+                    apps_list.visibility = View.VISIBLE
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+        })
     }
 
 
@@ -132,7 +151,7 @@ class Home : Activity() {
 
         apps = packageManager.queryIntentActivities(mainIntent, 0)
         val removedSet = preference.getStringSet(prefKey,null)
-/*
+
         apps = apps
                 .filter {
                     removedSet == null ||
@@ -140,8 +159,7 @@ class Home : Activity() {
                     it.activityInfo.loadLabel(packageManager).toString().indexOfAny(removedSet) != -1
                 }
                 .sortedBy { it.activityInfo.loadLabel(packageManager).toString() }
-                .toMutableList()
-                */
+
     }
 
     private fun toast(t: String){
