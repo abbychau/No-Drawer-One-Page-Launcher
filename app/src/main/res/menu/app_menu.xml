@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/app_menu"
+
+    >
+
+    <item android:id="@+id/menu_show_info"
+        android:title="@string/menu_show_info" />
+    <item android:id="@+id/menu_hide"
+        android:title="@string/menu_hide" />
+
+    <item android:id="@+id/menu_add_to_dock"
+        android:title="@string/menu_add_to_dock" />
+
+    <item android:id="@+id/menu_uninstall"
+        android:title="@string/menu_uninstall" />
+
+</menu>

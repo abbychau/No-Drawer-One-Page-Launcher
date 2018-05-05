@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">No Drawer One Page Launcher</string>
+    <string name="menu_show_info">Show Info</string>
+    <string name="menu_add_to_dock">Add to Dock</string>
+    <string name="menu_uninstall">Uninstall</string>
+    <string name="menu_hide">Hide</string>
+    <string name="show_hidden_apps">Show Hidden Apps</string>
+    <string name="about">About</string>
+    <string name="more">…</string>
+    <string name="menu_ascii">☰</string>
+    <string name="search">Search</string>
+    <string name="app_icon">App Icon</string>
+</resources>
