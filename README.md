@@ -13,7 +13,7 @@ And so, I make it in a night for myself.
 
 ## Screenshot
 
-![](https://user-images.githubusercontent.com/350283/39663996-5ce335d4-50b7-11e8-95d4-799ce69835b7.png | width=200)
+![screenshot](https://user-images.githubusercontent.com/350283/39676198-76abee80-51a1-11e8-98db-8389b6f43318.png)
 
 
 ## Task-List
@@ -22,7 +22,7 @@ Welcome to have PR and do them for me :3
 I will literally treat you a meal
 
 - [ ] Hide function
-- [ ] Search Manager
+- [x] Search Manager
 - [ ] Sort By
 - [ ] Column Settings
 - [ ] Dock

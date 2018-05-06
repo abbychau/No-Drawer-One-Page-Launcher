@@ -21,14 +21,17 @@ import android.view.Menu
 import android.widget.TextView
 import android.view.LayoutInflater
 import android.view.ViewGroup
-
-
+import android.icu.util.ULocale.getCountry
+import android.text.method.TextKeyListener.clear
+import java.util.*
 
 
 class Home : Activity() {
     private val prefKey = "removed_set"
-    private lateinit var apps: List<ResolveInfo>
-    private var adapterHandle = AppsAdapter()
+    private lateinit var display_apps:  List<ResolveInfo>
+    private lateinit var all_apps:      List<ResolveInfo>
+
+    private var adapterHandle: AppsAdapter = AppsAdapter()
     private lateinit var preference : SharedPreferences
     private lateinit var removedSet : MutableSet<String>
 
@@ -40,7 +43,7 @@ class Home : Activity() {
     }
 
     private val clickListener = OnItemClickListener { _, _, i, _ ->
-        val info = apps[i]
+        val info = display_apps[i]
         val pkg = info.activityInfo.packageName
         val cls = info.activityInfo.name
         val component = ComponentName(pkg, cls)
@@ -53,7 +56,7 @@ class Home : Activity() {
         //super.onBackPressed()
     }
     private val longClickListener = AdapterView.OnItemLongClickListener { _: AdapterView<*>, view1: View, i: Int, _: Long ->
-        val info = apps[i]
+        val info = display_apps[i]
         val pkg = info.activityInfo.packageName
         //info.activityInfo.name
         val popupMenu = PopupMenu(this@Home, view1)
@@ -68,7 +71,7 @@ class Home : Activity() {
                 }
                 R.id.menu_hide -> {
 
-                    val name = apps[i].activityInfo.packageName
+                    val name = display_apps[i].activityInfo.packageName
                     removedSet.add(name)
                     preference.edit().putStringSet(prefKey, removedSet).apply()
 
@@ -103,7 +106,10 @@ class Home : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_home)
         preference = PreferenceManager.getDefaultSharedPreferences(this)!!
-        removedSet = preference.getStringSet(prefKey,null)
+
+        removedSet = if (!preference.contains(prefKey)) mutableSetOf() else {
+            preference.getStringSet(prefKey, null)
+        }
 
         loadApps()
         apps_list.adapter = adapterHandle
@@ -114,11 +120,16 @@ class Home : Activity() {
 
         txtSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
-                if(p0.toString().isNotEmpty()){
-                    apps_list.visibility = View.INVISIBLE
-                    //TODO
-                }else{
-                    apps_list.visibility = View.VISIBLE
+                if (p0 != null) {
+                    display_apps = if (p0.isNotEmpty()) {
+                        all_apps.filter{
+                            it.activityInfo.packageName.toLowerCase().contains(p0.toString().toLowerCase())
+                        }
+                    }else{
+                        all_apps
+                    }
+                    adapterHandle.notifyDataSetChanged()
+
                 }
             }
 
@@ -150,15 +161,12 @@ class Home : Activity() {
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
         ImageView(this@Home)
 
-        apps = packageManager.queryIntentActivities(mainIntent, 0)
-
-        apps = apps
-                .filter {
-                    removedSet == null ||
-                    removedSet.size == 0 ||
-                    it.activityInfo.loadLabel(packageManager).toString().indexOfAny(removedSet) != -1
-                }
-                .sortedBy { it.activityInfo.loadLabel(packageManager).toString() }
+        all_apps = packageManager.queryIntentActivities(mainIntent, 0).sortedBy { it.activityInfo.loadLabel(packageManager).toString() }
+        display_apps = all_apps.filter {
+            removedSet == null ||
+            removedSet.size == 0 ||
+            it.activityInfo.loadLabel(packageManager).toString().indexOfAny(removedSet) != -1
+        }
 
     }
 
@@ -169,22 +177,23 @@ class Home : Activity() {
     inner class AppsAdapter : BaseAdapter() {
 
         override fun getCount(): Int {
-            return apps.size
+            return display_apps.size
         }
 
         override fun getItem(i: Int): Any {
-            return apps[i]
+            return display_apps[i]
         }
 
         override fun getItemId(i: Int): Long {
             return i.toLong()
         }
 
+
         override fun getView(i: Int, convertView: View?, parent: ViewGroup): View {
             val inflater = this@Home
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val gridView : View
-            val info = apps[i]
+            val info = display_apps[i]
 
             if (convertView == null) {
 
